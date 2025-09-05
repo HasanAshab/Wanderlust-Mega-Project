@@ -13,9 +13,12 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                echo "Commit SHA: ${env.GIT_COMMIT}"
+                echo "Branch: ${env.GIT_BRANCH}"
                 sh 'mkdir te'
             }
         }
+
     }
 
     post {

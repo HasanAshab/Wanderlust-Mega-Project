@@ -15,19 +15,14 @@ pipeline {
             steps {
                 echo "Commit SHA: ${env.GIT_COMMIT}"
                 echo "Branch: ${env.GIT_BRANCH}"
-                sh 'mkdir bar'
+                sh 'mkdir baz'
             }
         }
     }
 
     post {
         always {
-            cleanWs(cleanWhenNotBuilt: false,
-                    deleteDirs: true,
-                    disableDeferredWipeout: true,
-                    notFailBuild: false, //todo
-                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
-                               [pattern: '.propsfile', type: 'EXCLUDE']])
+            cleanWs()
         }
         success { echo '✅ Pipeline succeeded!' }
         failure { echo '❌ Pipeline failed!' }

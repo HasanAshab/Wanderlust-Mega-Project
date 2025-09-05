@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
         disableConcurrentBuilds()
         durabilityHint('PERFORMANCE_OPTIMIZED')
         preserveStashes(buildCount: 5)
-        // skipDefaultCheckout()
     }
     triggers {
         githubPush()
@@ -14,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                sh 'ls'
+                sh 'touch test.txt'
             }
         }
     }

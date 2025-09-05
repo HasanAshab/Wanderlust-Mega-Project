@@ -8,6 +8,9 @@ pipeline {
         preserveStashes(buildCount: 5)
         // skipDefaultCheckout()
     }
+    triggers {
+        githubPush()
+    }
 
     stages {
         stage('Checkout') {
@@ -16,7 +19,7 @@ pipeline {
             }
         }
     }
-  
+
     post {
         success { echo '✅ Pipeline succeeded!' }
         failure { echo '❌ Pipeline failed!' }

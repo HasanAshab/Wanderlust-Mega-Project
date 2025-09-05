@@ -15,7 +15,7 @@ pipeline {
             steps {
                 echo "Commit SHA: ${env.GIT_COMMIT}"
                 echo "Branch: ${env.GIT_BRANCH}"
-                sh 'mkdir foo'
+                sh 'mkdir bar'
             }
         }
     }
@@ -25,7 +25,7 @@ pipeline {
             cleanWs(cleanWhenNotBuilt: false,
                     deleteDirs: true,
                     disableDeferredWipeout: true,
-                    notFailBuild: true,
+                    notFailBuild: false, //todo
                     patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
                                [pattern: '.propsfile', type: 'EXCLUDE']])
         }

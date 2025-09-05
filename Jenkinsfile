@@ -13,16 +13,21 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                sh 'touch test.txt'
+                sh 'mkdir te'
             }
         }
     }
-  
+
     post {
+        always {
+        //     cleanWs(cleanWhenNotBuilt: false,
+        //             deleteDirs: true,
+        //             disableDeferredWipeout: true,
+        //             notFailBuild: true,
+        //             patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+        //                        [pattern: '.propsfile', type: 'EXCLUDE']])
+        // }
         success { echo '✅ Pipeline succeeded!' }
         failure { echo '❌ Pipeline failed!' }
-        // always { 
-        //     cleanWs()
-        // }
     }
 }

@@ -15,6 +15,7 @@ pipeline {
                 checkout scm
             }
         }
+    }
 
     post {
         success { echo '✅ Pipeline succeeded!' }

@@ -35,7 +35,7 @@ pipeline {
                 }
             }
         }
-
+  
         stage('CI') {
             parallel {
                 stage('Run Lint') {

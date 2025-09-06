@@ -29,7 +29,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 dir('frontend') { 
-                    sh 'npm ci'
+                    sh 'npm i'
                 }
             }
         }
@@ -38,13 +38,17 @@ pipeline {
             parallel {
                 stage('Run Lint') {
                     steps {
-                        sh 'npm run lint'
+                        dir('frontend') {
+                            sh 'npm run lint'
+                        }
                     }
                 }
 
                 stage('Run Tests') {
                     steps {
-                        sh 'npm test'
+                        dir('frontend') {
+                            sh 'npm test'
+                        }
                     }
                 }
             } 

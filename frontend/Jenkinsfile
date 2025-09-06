@@ -68,14 +68,14 @@ pipeline {
                         Registry: 'docker.io',
                         ImageBase: 'wanderlust',
                         ImageSuffix: 'frontend',
-                        Tags: [params.SHORT_SHA, 'latest']
+                        Tags: [params.SHORT_SHA, 'latest'],
                         Push: env.GIT_BRANCH == 'main',
                     )
                 }
             }
         }
     }
-  
+
     post {
         always {
             cleanWs()

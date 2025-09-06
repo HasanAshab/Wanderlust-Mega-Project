@@ -1,8 +1,10 @@
 @Library('Shared') _
 pipeline {
     agent { 
-        docker { image 'node:18-bullseye' }
-        args '-u root'
+        docker { 
+            image 'node:18-bullseye' 
+            args '-u root'
+        }
     }
 
     options {

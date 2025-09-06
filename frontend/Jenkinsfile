@@ -1,6 +1,11 @@
 @Library('Shared') _
 pipeline {
-    agent any
+    agent { 
+        docker { 
+            image 'node:18-bullseye' 
+            args '-u root'
+        }
+    }
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
@@ -26,9 +31,10 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('frontend') { 
-                    sh 'npm ci'
-                }
+                sh 'ls -la'
+                // dir('frontend') { 
+                //     sh 'ls -la'
+                // }
             }
         }
 

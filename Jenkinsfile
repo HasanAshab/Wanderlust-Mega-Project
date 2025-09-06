@@ -17,6 +17,7 @@ pipeline {
                 echo "Branch: ${env.GIT_BRANCH}"
             }
         }
+
         stage('Detect Changes') {
             steps {
                 script {
@@ -29,11 +30,37 @@ pipeline {
                     echo "Changed files: ${changedFiles}"
 
                     // Set flags
-                    env.BUILD_BACKEND = changedFiles.any { it.startsWith('backend/') }.toString()
                     env.BUILD_FRONTEND = changedFiles.any { it.startsWith('frontend/') }.toString()
+                    env.BUILD_BACKEND = changedFiles.any { it.startsWith('backend/') }.toString()
 
-                    echo "Build Backend? ${env.BUILD_BACKEND}"
                     echo "Build Frontend? ${env.BUILD_FRONTEND}"
+                    echo "Build Backend? ${env.BUILD_BACKEND}"
+                }
+            }
+        }
+
+        stage('Build Services') {
+            parallel {
+                stage('Frontend') {
+                    when {
+                        expression { env.BUILD_FRONTEND == "true" }
+                    }
+                    steps {
+                        build job: 'frontend', parameters: [
+                            string(name: 'DOCKER_TAG', value: "${env.GIT_COMMIT}"),
+                        ]
+                    }
+                }
+
+                stage('Backend') {
+                    when {
+                        expression { env.BUILD_BACKEND == "true" }
+                    }
+                    steps {
+                        build job: 'backend', parameters: [
+                            string(name: 'DOCKER_TAG', value: "${env.GIT_COMMIT}")
+                        ]
+                    }
                 }
             }
         }

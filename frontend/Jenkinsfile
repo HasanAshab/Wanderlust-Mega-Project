@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+        disableConcurrentBuilds()
+        durabilityHint('PERFORMANCE_OPTIMIZED')
+        preserveStashes(buildCount: 5)
+    }
+
+    parameters {
+        string(name: 'DOCKER_TAG', defaultValue: '', description: 'Docker image for latest push')
+    }
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo "Docker Tag: ${params.DOCKER_TAG}"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success { echo '✅ Pipeline succeeded!' }
+        failure { echo '❌ Pipeline failed!' }
+    }
+}

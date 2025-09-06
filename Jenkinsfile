@@ -49,7 +49,7 @@ pipeline {
                     }
                     steps {
                         build job: 'frontend', parameters: [
-                            string(name: 'IMAGE_TAG', value: "${env.SHORT_SHA}"),
+                            string(name: 'SHORT_SHA', value: "${env.SHORT_SHA}"),
                         ]
                     }
                 }
@@ -60,7 +60,7 @@ pipeline {
                     }
                     steps {
                         build job: 'backend', parameters: [
-                            string(name: 'IMAGE_TAG', value: "${env.SHORT_SHA}"),
+                            string(name: 'SHORT_SHA', value: "${env.SHORT_SHA}"),
                         ]
                     }
                 }

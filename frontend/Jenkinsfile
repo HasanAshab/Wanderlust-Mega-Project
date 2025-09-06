@@ -1,17 +1,16 @@
 @Library('Shared') _
 pipeline {
-    agent { 
-        docker { 
-            image 'node:18-bullseye' 
-            args '-u root'
-        }
-    }
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
         disableConcurrentBuilds()
         durabilityHint('PERFORMANCE_OPTIMIZED')
         preserveStashes(buildCount: 5)
+    }
+
+    tools {
+        nodejs 'node:18'
     }
 
     parameters {
@@ -31,10 +30,9 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'ls -la'
-                // dir('frontend') { 
-                //     sh 'ls -la'
-                // }
+                dir('frontend') { 
+                    sh 'npm ci'
+                }
             }
         }
 

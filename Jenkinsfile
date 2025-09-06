@@ -7,17 +7,16 @@ pipeline {
         durabilityHint('PERFORMANCE_OPTIMIZED')
         preserveStashes(buildCount: 5)
     }
+
     triggers {
         githubPush()
     }
-    stages {
-        stage('Checkout') {
-            steps {
-                echo "Commit SHA: ${env.GIT_COMMIT}"
-                echo "Branch: ${env.GIT_BRANCH}"
-            }
-        }
 
+    environment {
+        SHORT_SHA = "${env.GIT_COMMIT.take(7)}"
+    }
+
+    stages {
         stage('Detect Changes') {
             steps {
                 script {
@@ -27,14 +26,17 @@ pipeline {
                         returnStdout: true
                     ).trim().split("\n")
 
-                    echo "Changed files: ${changedFiles}"
-
                     // Set flags
                     env.BUILD_FRONTEND = changedFiles.any { it.startsWith('frontend/') }.toString()
                     env.BUILD_BACKEND = changedFiles.any { it.startsWith('backend/') }.toString()
 
-                    echo "Build Frontend? ${env.BUILD_FRONTEND}"
-                    echo "Build Backend? ${env.BUILD_BACKEND}"
+                    echo "Services to build:"
+                    if (env.BUILD_FRONTEND == "true") {
+                        echo "- Frontend"
+                    }
+                    if (env.BUILD_BACKEND == "true") {
+                        echo "- Backend"
+                    }
                 }
             }
         }
@@ -47,7 +49,7 @@ pipeline {
                     }
                     steps {
                         build job: 'frontend', parameters: [
-                            string(name: 'DOCKER_TAG', value: "${env.GIT_COMMIT}"),
+                            string(name: 'IMAGE_TAG', value: "${env.SHORT_SHA}"),
                         ]
                     }
                 }
@@ -58,7 +60,7 @@ pipeline {
                     }
                     steps {
                         build job: 'backend', parameters: [
-                            string(name: 'DOCKER_TAG', value: "${env.GIT_COMMIT}")
+                            string(name: 'IMAGE_TAG', value: "${env.SHORT_SHA}"),
                         ]
                     }
                 }

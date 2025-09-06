@@ -9,13 +9,39 @@ pipeline {
     }
 
     parameters {
-        string(name: 'DOCKER_TAG', defaultValue: '', description: 'Docker image for latest push')
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'Docker image tag for latest push')
     }
-  
+
     stages {
-        stage('Hello') {
+        stage('Validate Params') {
             steps {
-                echo "Docker Tag: ${params.DOCKER_TAG}"
+                script {
+                    if (!params.IMAGE_TAG?.trim()) {
+                        error "Parameter IMAGE_TAG is required but not provided!"
+                    }
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('CI') {
+            parallel {
+                stage('Run Lint') {
+                    steps {
+                        sh 'npm run lint'
+                    }
+                }
+
+                stage('Run Tests') {
+                    steps {
+                        sh 'npm test'
+                    }
+                }
             }
         }
     }

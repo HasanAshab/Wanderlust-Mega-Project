@@ -14,15 +14,15 @@ pipeline {
     }
 
     parameters {
-        string(name: 'IMAGE_TAG', defaultValue: '', description: 'Docker image tag for latest push')
+        string(name: 'SHORT_SHA', defaultValue: '', description: 'Short SHA of the commit')
     }
 
     stages {
         stage('Validate Params') {
             steps {
                 script {
-                    if (!params.IMAGE_TAG?.trim()) {
-                        error "Parameter IMAGE_TAG is required but not provided!"
+                    if (!params.SHORT_SHA?.trim()) {
+                        error "Parameter SHORT_SHA is required but not provided!"
                     }
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
                 }
             }
         }
-  
+
         stage('CI') {
             parallel {
                 stage('Run Lint') {
@@ -61,8 +61,8 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         docker_login("docker.io", env.DOCKER_USER, env.DOCKER_PASS)
-                        docker_build("hasan18205/wanderlust-frontend", params.IMAGE_TAG, "frontend")
-                        docker_push("hasan18205/wanderlust-frontend", params.IMAGE_TAG)
+                        docker_build("hasan18205/wanderlust-frontend", params.SHORT_SHA, "frontend")
+                        docker_push("hasan18205/wanderlust-frontend", params.SHORT_SHA)
                     }
                 }
             }

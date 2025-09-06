@@ -35,20 +35,22 @@ pipeline {
         }
 
         stage('CI') {
-            dir('frontend') {
-                parallel {
-                    stage('Run Lint') {
-                        steps {
-                            sh 'npm run lint'
+            steps {
+                dir('frontend') {
+                    parallel {
+                        stage('Run Lint') {
+                            steps {
+                                sh 'npm run lint'
+                            }
                         }
-                    }
 
-                    stage('Run Tests') {
-                        steps {
-                            sh 'npm test'
+                        stage('Run Tests') {
+                            steps {
+                                sh 'npm test'
+                            }
                         }
-                    }
-                } 
+                    } 
+                }
             }
         }
 

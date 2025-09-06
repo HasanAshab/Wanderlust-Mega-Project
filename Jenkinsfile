@@ -49,7 +49,8 @@ pipeline {
                     }
                     steps {
                         build job: 'frontend', parameters: [
-                            string(name: 'SHORT_SHA', value: "${env.SHORT_SHA}"),
+                            string(name: 'GIT_BRANCH', value: env.GIT_BRANCH),
+                            string(name: 'SHORT_SHA', value: env.SHORT_SHA),
                         ]
                     }
                 }
@@ -60,7 +61,8 @@ pipeline {
                     }
                     steps {
                         build job: 'backend', parameters: [
-                            string(name: 'SHORT_SHA', value: "${env.SHORT_SHA}"),
+                            string(name: 'GIT_BRANCH', value: env.GIT_BRANCH),
+                            string(name: 'SHORT_SHA', value: env.SHORT_SHA),
                         ]
                     }
                 }

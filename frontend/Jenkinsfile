@@ -1,4 +1,4 @@
-@Library('Shared') _
+@Library('Shared') _ // https://github.com/HasanAshab/Jenkins_SharedLib
 pipeline {
     agent any
 
@@ -14,6 +14,7 @@ pipeline {
     }
 
     parameters {
+        string(name: 'GIT_BRANCH', defaultValue: '', description: 'Branch name of the commit')
         string(name: 'SHORT_SHA', defaultValue: '', description: 'Short SHA of the commit')
     }
 
@@ -21,6 +22,9 @@ pipeline {
         stage('Validate Params') {
             steps {
                 script {
+                    if (!params.GIT_BRANCH?.trim()) {
+                        error "Parameter GIT_BRANCH is required but not provided!"
+                    }
                     if (!params.SHORT_SHA?.trim()) {
                         error "Parameter SHORT_SHA is required but not provided!"
                     }
@@ -55,29 +59,18 @@ pipeline {
                 }
             } 
         }
-  
+
         stage('Docker') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        docker_login("docker.io", env.DOCKER_USER, env.DOCKER_PASS)
-                        docker_build("${env.DOCKER_USER}/wanderlust-frontend", env.SHORT_SHA, "frontend")
-                        docker_push("${env.DOCKER_USER}/wanderlust-frontend", env.SHORT_SHA)
-                        
-                        
-                        // def tags = [params.SHORT_SHA, "latest"]
-                        // docker_login("docker.io", env.DOCKER_USER, env.DOCKER_PASS)
-                        // docker_build("${env.DOCKER_USER}/wanderlust-frontend", tags, "frontend")
-                        // trivy_scan_docker("${env.DOCKER_USER}/wanderlust-frontend", tags[0])
-                        // docker_push("${env.DOCKER_USER}/wanderlust-frontend", tags)
-                    }
-                    // docker_build_scan_push(
-                    //     CredId: 'docker',
-                    //     Registry: 'docker.io',
-                    //     ImageBase: 'wanderlust',
-                    //     ImageSuffix: 'frontend',
-                    //     Tags: [params.SHORT_SHA, 'latest']
-                    // )
+                    docker_build_scan_push(
+                        CredId: 'docker',
+                        Registry: 'docker.io',
+                        ImageBase: 'wanderlust',
+                        ImageSuffix: 'frontend',
+                        Tags: [params.SHORT_SHA, 'latest']
+                        Push: env.GIT_BRANCH == 'main',
+                    )
                 }
             }
         }

@@ -61,9 +61,23 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                         docker_login("docker.io", env.DOCKER_USER, env.DOCKER_PASS)
-                        docker_build("hasan18205/wanderlust-frontend", params.SHORT_SHA, "frontend")
-                        docker_push("hasan18205/wanderlust-frontend", params.SHORT_SHA)
+                        docker_build("${env.DOCKER_USER}/wanderlust-frontend", env.SHORT_SHA, "frontend")
+                        docker_push("${env.DOCKER_USER}/wanderlust-frontend", env.SHORT_SHA)
+                        
+                        
+                        // def tags = [params.SHORT_SHA, "latest"]
+                        // docker_login("docker.io", env.DOCKER_USER, env.DOCKER_PASS)
+                        // docker_build("${env.DOCKER_USER}/wanderlust-frontend", tags, "frontend")
+                        // trivy_scan_docker("${env.DOCKER_USER}/wanderlust-frontend", tags[0])
+                        // docker_push("${env.DOCKER_USER}/wanderlust-frontend", tags)
                     }
+                    // docker_build_scan_push(
+                    //     CredId: 'docker',
+                    //     Registry: 'docker.io',
+                    //     ImageBase: 'wanderlust',
+                    //     ImageSuffix: 'frontend',
+                    //     Tags: [params.SHORT_SHA, 'latest']
+                    // )
                 }
             }
         }

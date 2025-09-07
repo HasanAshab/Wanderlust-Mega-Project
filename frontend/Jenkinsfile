@@ -89,7 +89,7 @@ pipeline {
                     steps {
                         dir(env.SERVICE_NAME) {
                             script{
-                                sonarqube_analysis("Sonar", env.SERVICE_NAME, env.SERVICE_NAME)
+                                sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
                             }
                         }
                     }

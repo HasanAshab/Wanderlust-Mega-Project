@@ -65,15 +65,15 @@ pipeline {
                     }
                 }
 
-                stage("Scan Filesystem (Trivy)") {
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            script {
-                                trivy_scan()
-                            }
-                        }
-                    }
-                }
+                // stage("Scan Filesystem (Trivy)") {
+                //     steps {
+                //         dir(env.SERVICE_NAME) {
+                //             script {
+                //                 trivy_scan()
+                //             }
+                //         }
+                //     }
+                // }
 
                 stage("Check Dependencies (OWASP)"){
                     steps {

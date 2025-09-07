@@ -75,7 +75,7 @@ pipeline {
                 //     }
                 // }
 
-                stage("Check Dependencies (OWASP)"){
+                stage("Check Dependencies (OWASP)") {
                     steps {
                         dir(env.SERVICE_NAME) {
                             script{
@@ -85,20 +85,11 @@ pipeline {
                     }
                 }
 
-                stage("SonarQube: Code Analysis"){
+                stage("Analyze Code (SonarQube)") {
                     steps {
                         dir(env.SERVICE_NAME) {
-                            script{
+                            script {
                                 sonarqube_analysis("sonarqube-server", env.SERVICE_NAME, env.SERVICE_NAME)
-                            }
-                        }
-                    }
-                }
-
-                stage("SonarQube: Code Quality Gates"){
-                    steps {
-                        dir(env.SERVICE_NAME) {
-                            script{
                                 sonarqube_code_quality()
                             }
                         }

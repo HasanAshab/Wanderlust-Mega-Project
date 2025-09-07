@@ -18,6 +18,13 @@ pipeline {
         string(name: 'SHORT_SHA', defaultValue: '', description: 'Short SHA of the commit')
     }
 
+    environment {
+        DOCKER_CREDENTIALS_ID = 'docker'
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_IMAGE_BASE = 'wanderlust'
+        SERVICE_NAME = 'frontend'
+    }
+
     stages {
         stage('Validate Params') {
             steps {
@@ -34,7 +41,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                dir('frontend') { 
+                dir(env.SERVICE_NAME) { 
                     sh 'npm ci'
                 }
             }
@@ -44,7 +51,7 @@ pipeline {
             parallel {
                 stage('Run Lint') {
                     steps {
-                        dir('frontend') {
+                        dir(env.SERVICE_NAME) {
                             sh 'npm run lint'
                         }
                     }
@@ -52,22 +59,62 @@ pipeline {
 
                 stage('Run Tests') {
                     steps {
-                        dir('frontend') {
+                        dir(env.SERVICE_NAME) {
                             sh 'npm test'
                         }
                     }
                 }
-            } 
+
+                stage("Scan Filesystem (Trivy)") {
+                    steps {
+                        dir(env.SERVICE_NAME) {
+                            script {
+                                trivy_scan()
+                            }
+                        }
+                    }
+                }
+
+                stage("Check Dependencies (OWASP)"){
+                    steps {
+                        dir(env.SERVICE_NAME) {
+                            script{
+                                owasp_dependency()
+                            }
+                        }
+                    }
+                }
+
+                stage("SonarQube: Code Analysis"){
+                    steps {
+                        dir(env.SERVICE_NAME) {
+                            script{
+                                sonarqube_analysis("Sonar", env.SERVICE_NAME, env.SERVICE_NAME)
+                            }
+                        }
+                    }
+                }
+
+                stage("SonarQube: Code Quality Gates"){
+                    steps {
+                        dir(env.SERVICE_NAME) {
+                            script{
+                                sonarqube_code_quality()
+                            }
+                        }
+                    }
+                }
+            }
         }
-  
+
         stage('Docker') {
             steps {
                 script {
                     docker_build_scan_push(
-                        CredId: 'docker',
-                        Registry: 'docker.io',
-                        ImageBase: 'wanderlust',
-                        ImageSuffix: 'frontend',
+                        CredId: env.DOCKER_CREDENTIALS_ID,
+                        Registry: env.DOCKER_REGISTRY,
+                        ImageBase: env.DOCKER_IMAGE_BASE,
+                        ImageSuffix: env.SERVICE_NAME,
                         Tags: [params.SHORT_SHA, 'latest'],
                         Push: env.GIT_BRANCH == 'main',
                     )
